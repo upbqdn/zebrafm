@@ -1,7 +1,8 @@
-# zebra-chain-arith — Lean 4 proofs for `zebra-chain` arithmetic
+# zebrafm — Lean 4 proofs for [zebra-chain](https://github.com/ZcashFoundation/zebra)
 
-Kernel-checked Lean 4 theorems for the consensus arithmetic and parsing layer
-of [zebra-chain](https://github.com/ZcashFoundation/zebra):
+(formerly `zebra-chain-arith`; renamed once the scope outgrew "arith")
+
+Kernel-checked Lean 4 theorems for the consensus surface of zebra-chain:
 
 - `Height` arithmetic (block heights, activation comparisons),
 - `Amount` arithmetic (zatoshi balances under `Constraint` markers),

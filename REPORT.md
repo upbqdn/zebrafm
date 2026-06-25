@@ -1,4 +1,4 @@
-# Final Report — `zebra-chain-arith`
+# Final Report — `zebrafm`
 
 This report covers the kernel-checked Lean 4 verification of the
 arithmetic and parsing layer of [`zebra-chain`](https://github.com/ZcashFoundation/zebra).
