@@ -23,3 +23,51 @@ import ZebraChainArith.Bip34CoinbaseHeight
 import ZebraChainArith.BlockHeader
 import ZebraChainArith.HashRoundTrip
 import ZebraChainArith.PoolValueBalance
+-- Wave 2:
+import ZebraChainArith.HistoryTreeAppendOnly
+import ZebraChainArith.EquihashSolution
+import ZebraChainArith.CompactDifficulty
+import ZebraChainArith.SaplingNoteCommitment
+-- Wave 2 retry / cleanup:
+import ZebraChainArith.NetworkUpgradeBridge
+import ZebraChainArith.DAAMedianWindow
+import ZebraChainArith.TransactionV5Header
+import ZebraChainArith.TransparentAddress
+import ZebraChainArith.Nullifiers
+import ZebraChainArith.OrchardActionBounds
+-- Wave 3:
+import ZebraChainArith.SlowStartSubsidy
+import ZebraChainArith.EquihashParams
+import ZebraChainArith.Zip209NegativeValuePool
+-- Wave 3 retry:
+import ZebraChainArith.Zip1014Devfund
+import ZebraChainArith.Zip216CanonicalPoint
+import ZebraChainArith.Zip203Expiry
+import ZebraChainArith.PeerConnectionLimits
+import ZebraChainArith.InventoryCacheSize
+import ZebraChainArith.MempoolEviction
+import ZebraChainArith.JoinSplitProof
+import ZebraChainArith.OrchardAnchorBytes
+-- Wave 3 retry-2:
+import ZebraChainArith.Zip1015FundingStreams
+import ZebraChainArith.Zip2001Lockbox
+import ZebraChainArith.Zip213ShieldedCoinbase
+import ZebraChainArith.AnchorValidity
+import ZebraChainArith.NoteCommitmentTreeDepth
+import ZebraChainArith.TransactionMaxSize
+import ZebraChainArith.Zip200BranchIdBinding
+-- Wave 4:
+import ZebraChainArith.SighashTypes
+import ZebraChainArith.CanopyDeferredEarn
+-- Wave 4 retry:
+import ZebraChainArith.Zip243SaplingSighash
+import ZebraChainArith.Zip244TxIdDigest
+import ZebraChainArith.Zip225V5Layout
+import ZebraChainArith.Zip211SproutClosed
+-- Wave 4 retry-2:
+import ZebraChainArith.OrchardIncrementalMerkle
+import ZebraChainArith.SaplingIncrementalMerkle
+import ZebraChainArith.PedersenAbstract
+import ZebraChainArith.NU63IronwoodLayout
+-- ValueCommitment (from wave 2 fan-out triple-nested, recovered):
+import ZebraChainArith.ValueCommitment

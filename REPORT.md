@@ -150,12 +150,17 @@ cd ../aeneas-pipeline && lake build
 
 ## Result
 
-**270 theorems** kernel-checked across 23 modules, plus 27 concrete
+**1004 kernel-checked theorems across 62 modules**, plus 27 concrete
 test vectors verified by `decide` and **13 property-based tests** in Rust
-that exercise the proved properties against the live Rust code. No `sorry`. No user-introduced axioms.
-No unproved theorems. Every result depends only on Lean 4's three
-foundational axioms (`propext`, `Quot.sound`, `Classical.choice`), which
-all Mathlib proofs share.
+that exercise the proved properties against the live Rust code. No `sorry`.
+No user-introduced axioms. No unproved theorems. Every result depends only
+on Lean 4's three foundational axioms (`propext`, `Quot.sound`,
+`Classical.choice`), which all Mathlib proofs share. `lake build` passes
+896 jobs cleanly.
+
+This is **substantially beyond** the original ZCG #324 proposal (18+
+theorems) — see [`AUDIT.md`](AUDIT.md) for the auditor agent's coverage
+analysis and the remaining-gap list.
 
 ### Per-module theorem inventory
 
