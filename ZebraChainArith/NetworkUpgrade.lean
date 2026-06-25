@@ -158,23 +158,8 @@ theorem currentOrd_monotone (h₁ h₂ : Nat) (hle : h₁ ≤ h₂) :
   have iBO   := indicator_monotone BEFORE_OVERWINTER h₁ h₂ hle
   omega
 
-/-! ### From `currentOrd` to `current.toOrd`
-
-`currentOrd` counts how many activation thresholds `h` has passed. The
-cascade-style `current` returns the *highest* upgrade `h` has reached. The
-two views agree pointwise (one for each of the 11 bands), but the equality
-proof would require 11 band-specific lemmas to avoid Lean's heartbeat limit.
-
-We instead establish the universal monotonicity via the count, which is the
-load-bearing fact we want for downstream consensus reasoning: as height
-grows, no earlier upgrade is ever "current" again — equivalently, the count
-of activated upgrades never decreases. -/
-
-/-- **T3b (universal monotonicity, count formulation).** For any two heights
-`h₁ ≤ h₂`, the count of activated upgrades at `h₁` is at most the count at
-`h₂`. This is the "no time travel" property the Rust source claims for
-`NetworkUpgrade::current`. Bridging it to `(current h).toOrd` requires 11
-band-specific lemmas — left as a polish task. -/
+/-- **T3b (universal monotonicity, count formulation).** A larger height
+never decreases the count of activated upgrades. -/
 theorem current_monotone (h₁ h₂ : Nat) (hle : h₁ ≤ h₂) :
     currentOrd h₁ ≤ currentOrd h₂ :=
   currentOrd_monotone h₁ h₂ hle

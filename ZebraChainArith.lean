@@ -5,4 +5,6 @@ import ZebraChainArith.CompactSize
 import ZebraChainArith.NetworkUpgrade
 import ZebraChainArith.LockTime
 import ZebraChainArith.Subsidy
+import ZebraChainArith.Zip317
+import ZebraChainArith.ConsensusBranchId
 import ZebraChainArith.TestVectors

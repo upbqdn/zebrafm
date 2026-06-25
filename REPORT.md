@@ -16,9 +16,52 @@ block and transaction through:
 | `NetworkUpgrade` activation logic | `zebra-chain/src/parameters/network_upgrade.rs` + `constants.rs` | `ZebraChainArith/NetworkUpgrade.lean` |
 | `LockTime` serialisation | `zebra-chain/src/transaction/lock_time.rs` | `ZebraChainArith/LockTime.lean` |
 | `halving` / `block_subsidy` | `zebra-chain/src/parameters/network/subsidy.rs` | `ZebraChainArith/Subsidy.lean` |
+| ZIP-317 conventional fee | `zebra-chain/src/transaction/unmined/zip317.rs` | `ZebraChainArith/Zip317.lean` |
+| Consensus branch IDs | `zebra-chain/src/parameters/network_upgrade.rs:225` | `ZebraChainArith/ConsensusBranchId.lean` |
 
 Concrete test vectors taken from the Rust doctests are in
 `ZebraChainArith/TestVectors.lean` and are `decide`-checked.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    ZC["zebra-chain<br/>(live upstream)"]
+    AN["rust-crate/anchors/<br/>(pinned snapshot)"]
+    RC["rust-crate/src/<br/>(extraction crate)"]
+    CH[Charon]
+    AE[Aeneas]
+    LE["aeneas-pipeline/<br/>Extracted.lean"]
+    CO["coq-pipeline/<br/>ZebraChainArith.v"]
+    HL["ZebraChainArith/<br/>hand-translated Lean"]
+    PT["rust-crate/tests/<br/>proptest"]
+
+    ZC -. drift-check .-> AN
+    AN -. manual lift .-> RC
+    RC --> CH
+    CH --> AE
+    AE --> LE
+    AE --> CO
+    RC -. parallel hand-model .-> HL
+    RC --> PT
+
+    HL -. proofs .-> P1[("Lean theorems")]
+    LE -. proofs .-> P1
+    CO -. proofs .-> P2[("Coq theorems")]
+    PT -. runtime checks .-> P3[("Property tests")]
+
+    style P1 fill:#dfd
+    style P2 fill:#dfd
+    style P3 fill:#dfd
+```
+
+Four independent rot detectors guard the artifact:
+| Detector | Catches |
+|---|---|
+| `lean_action_ci.yml` | Lean proofs vs definitions |
+| `aeneas-extract.yml` | `Extracted.lean` vs `rust-crate/` |
+| `drift-check.yml` | `rust-crate/anchors/` vs live `zebra-chain` |
+| `rust-proptest.yml` | live Rust behaviour vs proved spec |
 
 ## Methodology
 
@@ -92,7 +135,7 @@ cd ../aeneas-pipeline && lake build
 
 ## Result
 
-**81 theorems** kernel-checked across the six modules, plus 27 concrete
+**92 theorems** kernel-checked across eight modules, plus 27 concrete
 test vectors verified by `decide` and **13 property-based tests** in Rust
 that exercise the proved properties against the live Rust code. No `sorry`. No user-introduced axioms.
 No unproved theorems. Every result depends only on Lean 4's three
@@ -245,8 +288,14 @@ directions:
 
 ## Roadmap
 
-This pilot covers the consensus-critical *arithmetic and parsing* layer.
-Natural follow-on targets, in rough order of marginal value:
+See [`ROADMAP.md`](ROADMAP.md) for a full deep-research survey of what
+else is worth verifying across Zebra. Short version: 23 candidate targets
+across `zebra-chain`, `zebra-consensus`, `zebra-network`, `zebra-state`,
+and `zebra-rpc`. Highest near-term ROI is items in the "Tractable next
+phases" section of `ROADMAP.md`.
+
+The pilot scope covers the consensus-critical *arithmetic and parsing*
+layer. Natural follow-on targets, in rough order of marginal value:
 
 1. **Replace hand-translation with Aeneas.** Eliminates the drift gap and
    restores the credibility claim the original grant proposal made for the

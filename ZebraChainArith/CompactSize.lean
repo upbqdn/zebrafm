@@ -43,7 +43,9 @@ def U64_MAX : Nat := 18446744073709551615
 
 /-! ## Encoder and decoder -/
 
-/-- The encoder: produces the canonical CompactSize bytes for `n` (assumed `< 2^64`). -/
+/-- The encoder: produces the canonical CompactSize bytes for `n` (assumed `< 2^64`).
+Source: `zebra-chain/src/serialization/compact_size.rs:317`
+(`impl ZcashSerialize for CompactSize64`) -/
 def encode (n : Nat) : List Nat :=
   if n ≤ 0xfc then
     [n]
@@ -64,7 +66,9 @@ def encode (n : Nat) : List Nat :=
 
 /-- The decoder. Returns `Some (value, remaining)` or `None` for malformed /
 non-canonical input. Models the Rust `zcash_deserialize` with the canonicity
-guards in each of the `0xfd`/`0xfe`/`0xff` branches. -/
+guards in each of the `0xfd`/`0xfe`/`0xff` branches.
+Source: `zebra-chain/src/serialization/compact_size.rs:339`
+(`impl ZcashDeserialize for CompactSize64`) -/
 def decode (bytes : List Nat) : Option (Nat × List Nat) :=
   match bytes with
   | [] => none

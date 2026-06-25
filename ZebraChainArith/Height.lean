@@ -15,26 +15,31 @@ arithmetic as `Int` arithmetic.
 
 namespace Zebra.Height
 
-/-- The maximum height as a `Nat`: `u32::MAX / 2 = 2^31 - 1`. -/
+/-- The maximum height as a `Nat`: `u32::MAX / 2 = 2^31 - 1`.
+Source: `zebra-chain/src/block/height.rs:67` -/
 def MAX_AS_U32 : Nat := 2 ^ 31 - 1
 
-/-- `Height::try_from<u32>`: returns `Some h` iff `h ≤ MAX_AS_U32`. -/
+/-- `Height::try_from<u32>`: returns `Some h` iff `h ≤ MAX_AS_U32`.
+Source: `zebra-chain/src/block/height.rs:133` (`impl TryFrom<u32> for Height`) -/
 def tryFromU32 (n : Nat) : Option Nat :=
   if n ≤ MAX_AS_U32 then some n else none
 
-/-- `Add<HeightDiff> for Height`. -/
+/-- `Add<HeightDiff> for Height`.
+Source: `zebra-chain/src/block/height.rs:264` (`impl Add<HeightDiff> for Height`) -/
 def add (h : Nat) (d : Int) : Option Nat :=
   if 0 ≤ (h : Int) + d ∧ (h : Int) + d ≤ (MAX_AS_U32 : Int) then
     some ((h : Int) + d).toNat
   else none
 
-/-- `Sub<HeightDiff> for Height`. -/
+/-- `Sub<HeightDiff> for Height`.
+Source: `zebra-chain/src/block/height.rs:248` (`impl Sub<HeightDiff> for Height`) -/
 def sub (h : Nat) (d : Int) : Option Nat :=
   if 0 ≤ (h : Int) - d ∧ (h : Int) - d ≤ (MAX_AS_U32 : Int) then
     some ((h : Int) - d).toNat
   else none
 
-/-- `Sub<Height> for Height`: signed difference of two height values. -/
+/-- `Sub<Height> for Height`: signed difference of two height values.
+Source: `zebra-chain/src/block/height.rs:234` (`impl Sub<Height> for Height`) -/
 def subH (lhs rhs : Nat) : Int := (lhs : Int) - (rhs : Int)
 
 /-! ## Theorems -/

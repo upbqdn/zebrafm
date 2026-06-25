@@ -21,13 +21,17 @@ The three Rust constraint markers (`NegativeAllowed`, `NonNegative`,
 
 namespace Zebra.Amount
 
-/-- Number of zatoshis in 1 ZEC. -/
+/-- Number of zatoshis in 1 ZEC.
+Source: `zebra-chain/src/amount.rs:607` -/
 def COIN : Int := 100_000_000
 
-/-- The maximum zatoshi amount: `21_000_000 * COIN = 2_100_000_000_000_000`. -/
+/-- The maximum zatoshi amount: `21_000_000 * COIN = 2_100_000_000_000_000`.
+Source: `zebra-chain/src/amount.rs:610` -/
 def MAX_MONEY : Int := 21_000_000 * COIN
 
-/-- The three `Constraint` markers from the Rust source. -/
+/-- The three `Constraint` markers from the Rust source.
+Sources: `NegativeAllowed` at `zebra-chain/src/amount.rs:556`,
+`NonNegative` at `:578`, `NegativeOrZero` at `:598`. -/
 inductive Constraint
   | negativeAllowed
   | nonNegative

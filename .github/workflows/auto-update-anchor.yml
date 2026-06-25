@@ -1,0 +1,67 @@
+name: Anchor auto-update
+
+on:
+  schedule:
+    # Weekly check on Monday 12:00 UTC.
+    - cron: '0 12 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  bump-anchor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Fetch zebra-chain main HEAD and re-snapshot the anchored sources
+        id: refresh
+        run: |
+          set -e
+          new_sha=$(curl -fsSL https://api.github.com/repos/ZcashFoundation/zebra/commits/main | jq -r .sha)
+          base="https://raw.githubusercontent.com/ZcashFoundation/zebra/${new_sha}"
+          tmp=$(mktemp -d)
+          curl -fSL "${base}/zebra-chain/src/block/height.rs"               -o "${tmp}/height.rs"
+          curl -fSL "${base}/zebra-chain/src/amount.rs"                     -o "${tmp}/amount.rs"
+          curl -fSL "${base}/zebra-chain/src/serialization/compact_size.rs" -o "${tmp}/compact_size.rs"
+
+          changed=0
+          for f in height.rs amount.rs compact_size.rs; do
+            if ! diff -q "rust-crate/anchors/${f}" "${tmp}/${f}" >/dev/null; then
+              cp "${tmp}/${f}" "rust-crate/anchors/${f}"
+              changed=1
+            fi
+          done
+
+          if [ "${changed}" = "1" ]; then
+            sed -i -E "s/^      ZEBRA_PIN: .*/      ZEBRA_PIN: ${new_sha}/" \
+              .github/workflows/drift-check.yml
+            echo "changed=true"  >> $GITHUB_OUTPUT
+            echo "new_sha=${new_sha}" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Open PR with the re-snapshotted anchors
+        if: steps.refresh.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: anchor-auto-update
+          delete-branch: true
+          commit-message: |
+            chore(anchors): bump pinned zebra-chain to ${{ steps.refresh.outputs.new_sha }}
+          title: "chore(anchors): bump pinned zebra-chain"
+          body: |
+            Automated re-snapshot of `rust-crate/anchors/` against
+            `zebra-chain@${{ steps.refresh.outputs.new_sha }}`.
+
+            **Review checklist before merging:**
+            - [ ] The drift is benign (formatting, doc comments, new bystander
+              methods) — re-snapshot suffices.
+            - [ ] Or: the drift changes semantics — update `rust-crate/src/`
+              and the Lean proofs to match before merging.
+
+            CI's `drift-check` will turn green once the new SHA matches the
+            anchors here.
