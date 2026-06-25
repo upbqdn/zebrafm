@@ -5,3 +5,6 @@ edition = "2021"
 
 [lib]
 name = "zebra_chain_arith"
+
+[dev-dependencies]
+proptest = "1"

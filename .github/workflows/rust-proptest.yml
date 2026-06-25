@@ -1,0 +1,28 @@
+name: Rust property tests
+
+on:
+  push:
+    paths:
+      - 'rust-crate/**'
+      - '.github/workflows/rust-proptest.yml'
+  pull_request:
+    paths:
+      - 'rust-crate/**'
+      - '.github/workflows/rust-proptest.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install Rust toolchain (rust-toolchain pin)
+        run: rustup show
+
+      - name: Run property tests
+        working-directory: rust-crate
+        run: cargo test --tests

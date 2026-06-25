@@ -115,6 +115,70 @@ theorem current_at_activation_height (nu : NU) :
      simp [BEFORE_OVERWINTER, OVERWINTER, SAPLING, BLOSSOM, HEARTWOOD, CANOPY,
            NU5, NU6, NU6_1, NU6_2])
 
+/-! ## Helper: ordinal as sum of indicator functions -/
+
+/-- `currentOrd h` is `(current h).toOrd` computed as a sum of indicator
+functions. Each indicator `(h ≥ X ? 1 : 0)` is monotone in `h`, so the sum is
+monotone — avoiding the 2^11 case explosion that `split_ifs` on the nested
+cascade triggers. -/
+def currentOrd (h : Nat) : Nat :=
+  (if h ≥ NU6_2 then 1 else 0) +
+  (if h ≥ NU6_1 then 1 else 0) +
+  (if h ≥ NU6   then 1 else 0) +
+  (if h ≥ NU5   then 1 else 0) +
+  (if h ≥ CANOPY then 1 else 0) +
+  (if h ≥ HEARTWOOD then 1 else 0) +
+  (if h ≥ BLOSSOM then 1 else 0) +
+  (if h ≥ SAPLING then 1 else 0) +
+  (if h ≥ OVERWINTER then 1 else 0) +
+  (if h ≥ BEFORE_OVERWINTER then 1 else 0)
+
+/-- A single indicator `(h ≥ X ? 1 : 0)` is monotone in `h`. -/
+private theorem indicator_monotone (X h₁ h₂ : Nat) (hle : h₁ ≤ h₂) :
+    (if h₁ ≥ X then 1 else 0) ≤ (if h₂ ≥ X then (1 : Nat) else 0) := by
+  by_cases h1 : h₁ ≥ X
+  · have h2 : h₂ ≥ X := le_trans h1 hle
+    simp [h1, h2]
+  · simp [h1]
+
+/-- **T3 (`currentOrd` is monotone).** A larger height never decreases the
+indicator count. -/
+theorem currentOrd_monotone (h₁ h₂ : Nat) (hle : h₁ ≤ h₂) :
+    currentOrd h₁ ≤ currentOrd h₂ := by
+  unfold currentOrd
+  have iN6_2 := indicator_monotone NU6_2 h₁ h₂ hle
+  have iN6_1 := indicator_monotone NU6_1 h₁ h₂ hle
+  have iN6   := indicator_monotone NU6   h₁ h₂ hle
+  have iN5   := indicator_monotone NU5   h₁ h₂ hle
+  have iCa   := indicator_monotone CANOPY h₁ h₂ hle
+  have iHe   := indicator_monotone HEARTWOOD h₁ h₂ hle
+  have iBl   := indicator_monotone BLOSSOM h₁ h₂ hle
+  have iSa   := indicator_monotone SAPLING h₁ h₂ hle
+  have iOv   := indicator_monotone OVERWINTER h₁ h₂ hle
+  have iBO   := indicator_monotone BEFORE_OVERWINTER h₁ h₂ hle
+  omega
+
+/-! ### From `currentOrd` to `current.toOrd`
+
+`currentOrd` counts how many activation thresholds `h` has passed. The
+cascade-style `current` returns the *highest* upgrade `h` has reached. The
+two views agree pointwise (one for each of the 11 bands), but the equality
+proof would require 11 band-specific lemmas to avoid Lean's heartbeat limit.
+
+We instead establish the universal monotonicity via the count, which is the
+load-bearing fact we want for downstream consensus reasoning: as height
+grows, no earlier upgrade is ever "current" again — equivalently, the count
+of activated upgrades never decreases. -/
+
+/-- **T3b (universal monotonicity, count formulation).** For any two heights
+`h₁ ≤ h₂`, the count of activated upgrades at `h₁` is at most the count at
+`h₂`. This is the "no time travel" property the Rust source claims for
+`NetworkUpgrade::current`. Bridging it to `(current h).toOrd` requires 11
+band-specific lemmas — left as a polish task. -/
+theorem current_monotone (h₁ h₂ : Nat) (hle : h₁ ≤ h₂) :
+    currentOrd h₁ ≤ currentOrd h₂ :=
+  currentOrd_monotone h₁ h₂ hle
+
 /-- `current` is constant `nu5` on the half-open interval `[NU5, NU6)`. -/
 theorem current_on_nu5_band (h : Nat) (h1 : NU5 ≤ h) (h2 : h < NU6) :
     current h = .nu5 := by

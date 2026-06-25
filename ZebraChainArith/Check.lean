@@ -2,6 +2,8 @@ import ZebraChainArith.Height
 import ZebraChainArith.Amount
 import ZebraChainArith.CompactSize
 import ZebraChainArith.NetworkUpgrade
+import ZebraChainArith.LockTime
+import ZebraChainArith.Subsidy
 
 open Zebra
 
@@ -66,3 +68,27 @@ open Zebra
 #print axioms NetworkUpgrade.current_surjective
 #print axioms NetworkUpgrade.current_total
 #print axioms NetworkUpgrade.activation_heights_strictly_increasing
+#print axioms NetworkUpgrade.currentOrd_monotone
+
+-- LockTime
+#print axioms LockTime.encode_length
+#print axioms LockTime.roundtrip_height
+#print axioms LockTime.roundtrip_time
+#print axioms LockTime.roundtrip_universal
+#print axioms LockTime.decode_total
+#print axioms LockTime.decode_empty
+#print axioms LockTime.decode_one
+#print axioms LockTime.decode_two
+#print axioms LockTime.decode_three
+
+-- Subsidy
+#print axioms Subsidy.halving_monotone
+#print axioms Subsidy.halving_pre_blossom
+#print axioms Subsidy.halving_at_blossom
+#print axioms Subsidy.halving_one_interval_post_blossom
+#print axioms Subsidy.halvingDivisor_in_range
+#print axioms Subsidy.halvingDivisor_overflow
+#print axioms Subsidy.blockSubsidy_zero_when_overflow
+#print axioms Subsidy.blockSubsidy_at_blossom
+#print axioms Subsidy.blockSubsidy_first_halving
+#print axioms Subsidy.blockSubsidy_nonincreasing

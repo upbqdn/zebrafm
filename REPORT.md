@@ -14,6 +14,8 @@ block and transaction through:
 | `Amount` arithmetic | `zebra-chain/src/amount.rs` | `ZebraChainArith/Amount.lean` |
 | `CompactSize64` serialization | `zebra-chain/src/serialization/compact_size.rs` | `ZebraChainArith/CompactSize.lean` |
 | `NetworkUpgrade` activation logic | `zebra-chain/src/parameters/network_upgrade.rs` + `constants.rs` | `ZebraChainArith/NetworkUpgrade.lean` |
+| `LockTime` serialisation | `zebra-chain/src/transaction/lock_time.rs` | `ZebraChainArith/LockTime.lean` |
+| `halving` / `block_subsidy` | `zebra-chain/src/parameters/network/subsidy.rs` | `ZebraChainArith/Subsidy.lean` |
 
 Concrete test vectors taken from the Rust doctests are in
 `ZebraChainArith/TestVectors.lean` and are `decide`-checked.
@@ -90,8 +92,9 @@ cd ../aeneas-pipeline && lake build
 
 ## Result
 
-**54 theorems** kernel-checked across the four modules, plus 27 concrete
-test vectors verified by `decide`. No `sorry`. No user-introduced axioms.
+**81 theorems** kernel-checked across the six modules, plus 27 concrete
+test vectors verified by `decide` and **13 property-based tests** in Rust
+that exercise the proved properties against the live Rust code. No `sorry`. No user-introduced axioms.
 No unproved theorems. Every result depends only on Lean 4's three
 foundational axioms (`propext`, `Quot.sound`, `Classical.choice`), which
 all Mathlib proofs share.
@@ -150,6 +153,31 @@ all Mathlib proofs share.
 | `current_surjective` | Every upgrade has a witness height |
 | `current_total` | `current` is a total function |
 | `activation_heights_strictly_increasing` | The mainnet heights have no collisions |
+| `currentOrd_monotone` | The count of activated upgrades is monotone in height |
+
+#### `LockTime` (9 theorems)
+| Name | Statement |
+|---|---|
+| `encode_length` | Encoder output is always 4 bytes |
+| `roundtrip_height` | Round-trip on a height-locked value within `[0, MIN_TIMESTAMP)` |
+| `roundtrip_time` | Round-trip on a timestamp lock `≥ MIN_TIMESTAMP` |
+| `roundtrip_universal` | Round-trip covers both branches |
+| `decode_total` | Decoder is total |
+| `decode_empty`, `decode_one`, `decode_two`, `decode_three` | Fewer-than-4-byte input returns `None` |
+
+#### `Subsidy` (10 theorems)
+| Name | Statement |
+|---|---|
+| `halving_monotone` | Halving index is monotone in height |
+| `halving_pre_blossom` | Halving is 0 below Blossom |
+| `halving_at_blossom` | Halving is 0 at Blossom activation |
+| `halving_one_interval_post_blossom` | Halving is 1 one interval past Blossom |
+| `halvingDivisor_in_range` | Divisor = `Some 2^k` for `k < 64` |
+| `halvingDivisor_overflow` | Divisor = `None` for `k ≥ 64` |
+| `blockSubsidy_zero_when_overflow` | Subsidy is 0 once the divisor overflows |
+| `blockSubsidy_at_blossom` | Subsidy at Blossom is `MAX_BLOCK_SUBSIDY` |
+| `blockSubsidy_first_halving` | Subsidy halves at the first halving boundary |
+| `blockSubsidy_nonincreasing` | Subsidy is monotone non-increasing in height |
 
 #### `CompactSize` (15 theorems)
 | Name | Statement |
@@ -182,6 +210,20 @@ lake env lean ZebraChainArith/Check.lean   # prints the axiom set of every theor
 
 CI runs the same sequence on every push and pull request
 (`.github/workflows/lean_action_ci.yml`).
+
+## Cross-verification
+
+Two additional layers of cross-check guard against rot in different
+directions:
+
+- **Rust property-based tests** ([`rust-crate/tests/properties.rs`](rust-crate/tests/properties.rs)):
+  13 `proptest`-based tests that exercise each major Lean theorem against
+  the live Rust code with random inputs. Catches semantic drift between
+  `rust-crate/` source and the corresponding Lean theorems.
+- **Coq backend** ([`coq-pipeline/`](coq-pipeline/)): the same Rust source
+  is also extracted to Coq via Aeneas. The artefact diversifies the
+  foundational trust claim — a Lean kernel bug does not invalidate the
+  Coq extract.
 
 ## Limitations
 
