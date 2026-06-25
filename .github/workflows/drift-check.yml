@@ -1,0 +1,44 @@
+name: Drift check
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    # Weekly drift check against zebra-chain's main branch.
+    - cron: '0 12 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    env:
+      # Bump this when `rust-crate/anchors/` is re-snapshotted.
+      ZEBRA_PIN: ca730cb7f93b4b36d71dc9cff0c5b8773d03006e
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Diff anchored zebra-chain sources against the pinned upstream commit
+        run: |
+          set -e
+          tmp=$(mktemp -d)
+          base="https://raw.githubusercontent.com/ZcashFoundation/zebra/${ZEBRA_PIN}"
+          curl -fSL "${base}/zebra-chain/src/block/height.rs"        -o "${tmp}/height.rs"
+          curl -fSL "${base}/zebra-chain/src/amount.rs"              -o "${tmp}/amount.rs"
+          curl -fSL "${base}/zebra-chain/src/serialization/compact_size.rs" -o "${tmp}/compact_size.rs"
+
+          diff -u rust-crate/anchors/height.rs        "${tmp}/height.rs"
+          diff -u rust-crate/anchors/amount.rs        "${tmp}/amount.rs"
+          diff -u rust-crate/anchors/compact_size.rs  "${tmp}/compact_size.rs"
+          echo "Anchors match the pinned upstream commit."
+
+      - name: Warn if zebra-chain's main has moved past the pin (non-fatal)
+        if: github.event_name == 'schedule'
+        run: |
+          set -e
+          main_head=$(curl -fsSL https://api.github.com/repos/ZcashFoundation/zebra/commits/main | jq -r .sha)
+          if [ "${main_head}" != "${ZEBRA_PIN}" ]; then
+            echo "::warning ::zebra-chain main has moved past the pinned commit ${ZEBRA_PIN} (now ${main_head}); review and re-snapshot if appropriate."
+          fi

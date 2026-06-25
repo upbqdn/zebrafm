@@ -71,13 +71,17 @@ cd ../aeneas-pipeline && lake build
 - ✅ **Mechanical Rust-to-Lean lift via Aeneas.** The Aeneas pipeline
   proves the principle: the Rust source in `rust-crate/` is mechanically
   lifted to Lean and is amenable to proof.
-- ⚠️ **Partial drift detection.** When the Rust crate changes, the
-  emitted Lean changes, and the Aeneas-side proofs would break. This
-  catches drift between the *Rust extraction crate* and *its Lean
-  extract*. It does NOT yet catch drift between the live
-  `zebra-chain/src/...` source and our `rust-crate/`. Closing that final
-  gap needs a CI step that diffs `rust-crate/src/{amount,compact_size,
-  height}.rs` against pinned snippets of `zebra-chain`.
+- ✅ **Drift detection (two-stage).** Stage one: when the Rust crate
+  changes, the emitted Lean changes and the Aeneas-side proofs would
+  break — this catches drift between `rust-crate/` and its extracted
+  Lean. Stage two: the
+  [`drift-check.yml`](.github/workflows/drift-check.yml) CI step pins a
+  specific upstream commit, snapshots the three target files into
+  [`rust-crate/anchors/`](rust-crate/anchors/), and fails on any
+  divergence between the snapshot and the pinned upstream — catching
+  drift between the live `zebra-chain` source and our `rust-crate/`. A
+  weekly schedule warns when `zebra-chain`'s `main` moves past the pin,
+  prompting a re-snapshot review.
 - ⚠️ **No byte-level I/O modelling.** The encoder/decoder operate over
   `List Nat` (top-level proofs) or `Vec u8` (Aeneas). The
   `byteorder::Reader`/`Writer` boundary in `zebra-chain` is treated as a
