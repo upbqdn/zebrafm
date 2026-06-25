@@ -18,6 +18,21 @@ block and transaction through:
 | `halving` / `block_subsidy` | `zebra-chain/src/parameters/network/subsidy.rs` | `ZebraChainArith/Subsidy.lean` |
 | ZIP-317 conventional fee | `zebra-chain/src/transaction/unmined/zip317.rs` | `ZebraChainArith/Zip317.lean` |
 | Consensus branch IDs | `zebra-chain/src/parameters/network_upgrade.rs:225` | `ZebraChainArith/ConsensusBranchId.lean` |
+| Block / protocol size limits | `zebra-chain/src/block/serialize.rs` + `serialization/zcash_serialize.rs` | `ZebraChainArith/BlockSizeLimits.lean` |
+| Coinbase maturity | `zebra-chain/src/transparent.rs:54` | `ZebraChainArith/CoinbaseMaturity.lean` |
+| Block max-time (future block tolerance) | `zebra-chain/src/parameters/network_upgrade.rs` + `constants.rs` | `ZebraChainArith/BlockMaxTime.lean` |
+| Reorg-window finality | `MAX_BLOCK_REORG_HEIGHT` | `ZebraChainArith/ReorgWindow.lean` |
+| Founders' reward | `zebra-chain/src/parameters/network/subsidy.rs:539` | `ZebraChainArith/FoundersReward.lean` |
+| Addr / Inv message caps | `zebra-network/src/constants.rs:301`, `protocol/external/inv.rs:190,201` | `ZebraChainArith/AddrMessageCap.lean` |
+| Mempool admission (unpaid actions) | `zebra-chain/src/transaction/unmined/zip317.rs` | `ZebraChainArith/MempoolAdmission.lean` |
+| Bech32 (BIP-173) encoding shape | BIP-173 | `ZebraChainArith/Bech32.lean` |
+| Min network protocol version per NU | `zebra-network/src/protocol/external/types.rs:88`, `constants.rs:411` | `ZebraChainArith/MinNetworkVersion.lean` |
+| Testnet min-difficulty rule (ZIP-208) | `zebra-chain/src/parameters/network_upgrade.rs` | `ZebraChainArith/TestnetMinDifficulty.lean` |
+| PoW averaging window | `POW_AVERAGING_WINDOW`, `POW_MEDIAN_BLOCK_SPAN` | `ZebraChainArith/PowAveragingWindow.lean` |
+| BIP-34 coinbase height prefix | `zebra-chain/src/transparent/serialize.rs:58` | `ZebraChainArith/Bip34CoinbaseHeight.lean` |
+| Block header fixed layout (140 bytes) | `zebra-chain/src/block/header.rs` | `ZebraChainArith/BlockHeader.lean` |
+| Block / transaction hash round-trip | `zebra-chain/src/block/hash.rs`, `transaction/hash.rs` | `ZebraChainArith/HashRoundTrip.lean` |
+| `ValueBalance<NonNegative>` (pool balances) | `zebra-chain/src/value_balance.rs` | `ZebraChainArith/PoolValueBalance.lean` |
 
 Concrete test vectors taken from the Rust doctests are in
 `ZebraChainArith/TestVectors.lean` and are `decide`-checked.
@@ -135,7 +150,7 @@ cd ../aeneas-pipeline && lake build
 
 ## Result
 
-**92 theorems** kernel-checked across eight modules, plus 27 concrete
+**270 theorems** kernel-checked across 23 modules, plus 27 concrete
 test vectors verified by `decide` and **13 property-based tests** in Rust
 that exercise the proved properties against the live Rust code. No `sorry`. No user-introduced axioms.
 No unproved theorems. Every result depends only on Lean 4's three
@@ -240,6 +255,138 @@ all Mathlib proofs share.
 | `canonicity_band4` | Decoder rejects non-minimal 9-byte encodings |
 | `messageTryFrom_iff` | `CompactSizeMessage::try_from` succeeds iff under cap |
 | `messageTryFrom_rejects_overlimit` | Memory-DoS preallocation values rejected |
+
+#### `BlockSizeLimits` (14 theorems)
+
+Models `MAX_BLOCK_BYTES = 2_000_000` (`zebra-chain/src/block/serialize.rs`)
+and `MAX_PROTOCOL_MESSAGE_LEN = 2*1024*1024` (`zebra-chain/src/serialization/zcash_serialize.rs`).
+Theorems cover the size-check iff, monotonicity in bound, anti-tone in size,
+the `MAX_BLOCK_BYTES ≤ MAX_PROTOCOL_MESSAGE_LEN` inequality with corollary,
+boundary acceptance and one-past-bound rejection, plus concrete-value
+and slack lemmas.
+
+#### `CoinbaseMaturity` (10 theorems)
+
+Models `MIN_TRANSPARENT_COINBASE_MATURITY = 100` from `zebra-chain/src/transparent.rs:54`.
+`canSpend c s := s ≥ c + 100`. Theorems: iff form, immature rejection,
+spend at exact maturity, monotonicity in spend height, anti-tone in
+created height, equivalence with `minSpendHeight`, the constant equals 100,
+genesis allow/deny boundary, and Nat-difference characterisation
+(forward + converse).
+
+#### `BlockMaxTime` (12 theorems)
+
+Models the Zcash future-block-time consensus rule
+`block_time ≤ now + MAX_BLOCK_TIME_TOLERANCE` (= 7200 s).
+Theorems: constant value, iff with the linear inequality, three concrete
+acceptance cases, tight rejection of boundary+1 and of anything above
+`maxAcceptable`, monotonicity in `now` and anti-monotonicity in
+`blockTime`, plus `maxAcceptable` lemmas.
+
+#### `ReorgWindow` (11 theorems)
+
+Models `MAX_BLOCK_REORG_HEIGHT = 1000`. Theorems cover the iff
+characterisation of finality, closure under tip advancement,
+anti-monotonicity in `block_height`, the boundary at exactly 1000,
+partition into finalized / in-window, and concrete cases for tip,
+above-tip, and genesis.
+
+#### `FoundersReward` (14 theorems)
+
+Models the founders reward as `subsidy / 5` when active and 0 otherwise,
+matching `founders_reward` in `zebra-chain/src/parameters/network/subsidy.rs:539`.
+Theorems: divisor = 5, the 20% ratio identity, founders-reward = 0
+post-Canopy, miner gets full subsidy post-Canopy, the pre-Canopy formula,
+`5 * founders ≤ subsidy` and `founders ≤ subsidy` bounds, sum-conservation
+`miner + founders = subsidy` (pre- and post-Canopy), monotonicity of
+founders / miner reward, the 4/5 miner share characterisation, and two
+concrete numeric examples at the 1,250,000,000-zatoshi genesis subsidy.
+
+#### `AddrMessageCap` (14 theorems)
+
+Models three message caps: `MAX_ADDR_MESSAGE_ENTRIES = 1000`,
+`MAX_INV_MESSAGE_ENTRIES = 50000`, and `MAX_TX_INV_IN_SENT_MESSAGE = 25000`.
+Each gets a try-from-style cap function with iff/rejects/identity triple,
+plus boundary fixed-point / cap+1 cases and cross-cap monotonicity
+(`tx-sent ≤ inv-received`, `addr ≤ inv`).
+
+#### `MempoolAdmission` (9 theorems)
+
+Models the ZIP-317 unpaid-actions admission check. `unpaidActions`
+uses `Nat` truncating subtraction (`c - f / MARGINAL_FEE`), agreeing
+with the Rust `i64 → u32` saturating clip. Headline theorem:
+`admitted c f ↔ c ≤ f / MARGINAL_FEE`. Includes monotonicity in fee,
+anti-tone in conventional actions, sufficient-fee admission,
+zero-action edge case, and two concrete numeric witnesses.
+
+#### `Bech32` (16 theorems)
+
+BIP-173 model: polymod register state modulo 2^30, HRP-expansion shape,
+`encode = hrp ++ [SEPARATOR] ++ data ++ checksum`. Theorems: separator
+is `'1'`, checksum length 6, charset size 32, polymod deterministic and
+within 30 bits, polymod distributes over snoc/append, HRP-expand length
+`2n+1`, encode-length identity, separator at index `|hrp|`, last
+`|checksum|` bytes of `encode` equal `checksum`, and `encode` injective
+in the data part.
+
+#### `MinNetworkVersion` (9 theorems)
+
+Models `Version::min_specified_for_upgrade`
+(`zebra-network/src/protocol/external/types.rs:88`). Theorems:
+monotonicity per network and over either network, `testnet ≤ mainnet`
+at every NU, all versions fit in u32, the concrete `INITIAL` value 170150,
+sanity lower bound, and strict progression between each consecutive
+mainnet NU pair.
+
+#### `TestnetMinDifficulty` (12 theorems)
+
+Models the ZIP-208 testnet minimum-difficulty rule.
+Headline: `postBlossomMinDifficultyGap = 450` (proves the 6 × 75 formula).
+Other theorems: pre-Blossom gap = 900, `isSome` iff, Mainnet always
+returns `none`, below-start returns `none`, the rule's predicate on
+network / height / time-gap boundaries, and monotonicity in the time gap.
+
+#### `PowAveragingWindow` (11 theorems)
+
+`POW_AVERAGING_WINDOW = 17`, `POW_MEDIAN_BLOCK_SPAN = 11`. Theorems:
+averaging window > median span, constant values, the averaging-window
+timespan formula, concrete pre/post-Blossom values 2550 s and 1275 s,
+Blossom-halves-spacing / halves-window identities, monotonicity in
+target spacing, zero-iff, and positivity.
+
+#### `Bip34CoinbaseHeight` (13 theorems)
+
+Models the BIP-34 coinbase scriptSig height prefix
+(`zebra-chain/src/transparent/serialize.rs:58`). Encoder produces
+canonical bytes per band: `OP_1..OP_16` for h in 1..16, then
+length-prefixed signed-LE for the 1/2/3/4-byte bands. Theorems:
+encoder-length identity and bounds (in {1..5}), round-trip in each band,
+empty / `OP_0` / non-canonical / unknown-prefix rejection.
+
+#### `BlockHeader` (8 theorems)
+
+Models the fixed-size 140-byte block header (omitting variable-length
+Equihash solution). Theorems: `toLE4` length = 4, encoder length = 140 on
+well-formed inputs, round-trip on version/time/bits, version prefix at
+offsets 0-3, the 140-byte size decomposition, and partial encoder
+injectivity on version.
+
+#### `HashRoundTrip` (12 theorems)
+
+Models `block::Hash` / `transaction::Hash` as 32-byte newtypes. Theorems:
+constructor round-trips, length preservation, injectivity, zero-hash
+well-definedness and byte structure, and the `ZcashSerialize` /
+`ZcashDeserialize` wire round-trip plus rejection of wrong-length input.
+
+#### `PoolValueBalance` (13 theorems)
+
+Models `ValueBalance<NonNegative>` as a 5-pool record (transparent,
+sprout, sapling, orchard, deferred) with each pool bounded by
+`MAX_MONEY = 21_000_000 * COIN = 2.1e15`. Theorems: `MAX_MONEY` value,
+`toBytes` length = 40 (= 5 pools × 8 bytes), `toLE8` length = 8,
+`total ≤ 5 * MAX_MONEY` (and concrete bound), zero validity, total of
+zero = 0, total monotone in transparent pool, pool-count layout identity,
+validity decidable, every emitted byte < 256.
 
 ## Reproducing
 
