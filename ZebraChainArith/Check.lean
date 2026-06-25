@@ -1,8 +1,56 @@
 import ZebraChainArith.Height
-open Zebra.Height
-#print axioms tryFromU32_iff
-#print axioms subH_eq
-#print axioms add_result_bounded
-#print axioms sub_result_bounded
-#print axioms add_sub_eq
-#print axioms add_monotone
+import ZebraChainArith.Amount
+import ZebraChainArith.CompactSize
+
+open Zebra
+
+-- Height
+#print axioms Height.tryFromU32_iff
+#print axioms Height.subH_eq
+#print axioms Height.add_result_bounded
+#print axioms Height.sub_result_bounded
+#print axioms Height.add_sub_eq
+#print axioms Height.add_monotone
+#print axioms Height.subH_antisymm
+#print axioms Height.subH_self
+#print axioms Height.tryFromU32_valid
+#print axioms Height.add_zero_identity
+#print axioms Height.sub_zero_identity
+
+-- Amount
+#print axioms Amount.validate_negativeAllowed_iff
+#print axioms Amount.validate_nonNegative_iff
+#print axioms Amount.checkedAdd_iff
+#print axioms Amount.checkedAdd_in_range
+#print axioms Amount.checkedSub_iff
+#print axioms Amount.checkedSub_in_range
+#print axioms Amount.mulU64_iff
+#print axioms Amount.neg_inverse
+#print axioms Amount.neg_negativeAllowed_closed
+#print axioms Amount.validate_negativeOrZero_iff
+#print axioms Amount.divU64_zero
+#print axioms Amount.divU64_nonNegative_closed
+#print axioms Amount.sum_empty
+#print axioms Amount.sum_singleton_nonNegative
+#print axioms Amount.checkedAdd_comm
+#print axioms Amount.neg_zero
+#print axioms Amount.neg_neg_eq
+#print axioms Amount.checkedSub_as_add
+#print axioms Amount.checkedAdd_zero
+
+-- CompactSize
+#print axioms CompactSize.roundtrip_band1
+#print axioms CompactSize.roundtrip_band2
+#print axioms CompactSize.roundtrip_band3
+#print axioms CompactSize.roundtrip_band4
+#print axioms CompactSize.encode_length
+#print axioms CompactSize.decode_total
+#print axioms CompactSize.canonicity_band2
+#print axioms CompactSize.canonicity_band3
+#print axioms CompactSize.canonicity_band4
+#print axioms CompactSize.messageTryFrom_iff
+#print axioms CompactSize.messageTryFrom_rejects_overlimit
+#print axioms CompactSize.decode_empty
+#print axioms CompactSize.encode_first_byte_canonical
+#print axioms CompactSize.encode_nonempty
+#print axioms CompactSize.roundtrip_universal

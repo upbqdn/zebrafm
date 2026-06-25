@@ -1,2 +1,4 @@
 import ZebraChainArith.Basic
 import ZebraChainArith.Height
+import ZebraChainArith.Amount
+import ZebraChainArith.CompactSize

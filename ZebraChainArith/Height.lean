@@ -1,5 +1,6 @@
 import Mathlib.Tactic.Common
 import Mathlib.Tactic.Linarith
+import Mathlib.Tactic.Ring
 
 /-!
 # Height arithmetic from `zebra-chain/src/block/height.rs`
@@ -94,5 +95,37 @@ theorem add_monotone (h : Nat) (d₁ d₂ : Int) (r₁ r₂ : Nat)
   obtain ⟨h0₁, _⟩ := hc₁
   obtain ⟨h0₂, _⟩ := hc₂
   omega
+
+/-! ## Bonus theorems -/
+
+/-- **B1.** `subH` is antisymmetric: `subH a b = -(subH b a)`. -/
+theorem subH_antisymm (a b : Nat) : subH a b = -(subH b a) := by
+  unfold subH; ring
+
+/-- **B2.** `subH a a = 0`. -/
+theorem subH_self (a : Nat) : subH a a = 0 := by
+  unfold subH; simp
+
+/-- **B3.** `tryFromU32` is idempotent on valid inputs: if `h ≤ MAX`, then
+`tryFromU32 h = some h`. -/
+theorem tryFromU32_valid (h : Nat) (hH : h ≤ MAX_AS_U32) :
+    tryFromU32 h = some h := by
+  unfold tryFromU32; simp [hH]
+
+/-- **B4.** `add h 0 = some h` for valid `h`: zero is a right identity. -/
+theorem add_zero_identity (h : Nat) (hH : h ≤ MAX_AS_U32) :
+    add h 0 = some h := by
+  unfold add
+  have h_nat : (0 : Int) ≤ (h : Int) := Int.natCast_nonneg h
+  have h_max : (h : Int) ≤ (MAX_AS_U32 : Int) := by exact_mod_cast hH
+  simp [h_nat, h_max]
+
+/-- **B5.** `sub h 0 = some h` for valid `h`: zero is a right identity for sub. -/
+theorem sub_zero_identity (h : Nat) (hH : h ≤ MAX_AS_U32) :
+    sub h 0 = some h := by
+  unfold sub
+  have h_nat : (0 : Int) ≤ (h : Int) := Int.natCast_nonneg h
+  have h_max : (h : Int) ≤ (MAX_AS_U32 : Int) := by exact_mod_cast hH
+  simp [h_nat, h_max]
 
 end Zebra.Height
