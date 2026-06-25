@@ -1,4 +1,4 @@
-import AeneasPipeline.Extracted
+import AeneasPipeline.Funs
 
 /-!
 # Proofs against Aeneas-extracted definitions
@@ -31,4 +31,12 @@ example : height.try_from_u32 2147483647#u32 = ok (some 2147483647#u32) := by
 example : height.try_from_u32 2147483648#u32 = ok none := by
   simp [height.try_from_u32, height.MAX_AS_U32]
   rfl
+
+/-- **try_from_u32 of u32::MAX fails.** Far above the valid range. -/
+example : height.try_from_u32 4294967295#u32 = ok none := by
+  simp [height.try_from_u32, height.MAX_AS_U32]
+  rfl
+
+
+
 

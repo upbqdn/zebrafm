@@ -1,2 +1,4 @@
-import AeneasPipeline.Extracted
+import AeneasPipeline.Types
+import AeneasPipeline.FunsExternal
+import AeneasPipeline.Funs
 import AeneasPipeline.Proofs
