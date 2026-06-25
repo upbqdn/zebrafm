@@ -1,7 +1,7 @@
-name = "ZebraChainArith"
+name = "Zebrafm"
 version = "0.1.0"
 keywords = ["math"]
-defaultTargets = ["ZebraChainArith"]
+defaultTargets = ["Zebrafm"]
 
 [leanOptions]
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`
@@ -15,10 +15,10 @@ scope = "leanprover-community"
 rev = "v4.31.0"
 
 [[lean_lib]]
-name = "ZebraChainArith"
+name = "Zebrafm"
 
 [[lean_lib]]
-name = "ZebraChainArithSpec"
+name = "ZebrafmSpec"
 
 [[lean_lib]]
-name = "ZebraChainArithProofs"
+name = "ZebrafmProofs"

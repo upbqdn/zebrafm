@@ -21,7 +21,7 @@ definition; the `i64` / `i128` widening from the Rust source is modelled as
 `Int` arithmetic, with explicit upper-bound hypotheses where the production
 type sizes matter (e.g. `U64_MAX` in `CompactSize64`).
 
-### `Height` ([`ZebraChainArith/Height.lean`](ZebraChainArith/Height.lean))
+### `Height` ([`Zebrafm/Height.lean`](Zebrafm/Height.lean))
 
 The Rust target is `zebra-chain/src/block/height.rs`.
 
@@ -44,7 +44,7 @@ Theorems:
 - `subH_antisymm`, `subH_self` — antisymmetry and reflexivity.
 - `tryFromU32_valid`, `add_zero_identity`, `sub_zero_identity` — identity laws.
 
-### `Amount` ([`ZebraChainArith/Amount.lean`](ZebraChainArith/Amount.lean))
+### `Amount` ([`Zebrafm/Amount.lean`](Zebrafm/Amount.lean))
 
 The Rust target is `zebra-chain/src/amount.rs`.
 
@@ -75,7 +75,7 @@ Theorems:
 - `checkedAdd_comm`, `neg_zero`, `neg_neg_eq`, `checkedSub_as_add`,
   `checkedAdd_zero` — algebraic laws.
 
-### `CompactSize64` ([`ZebraChainArith/CompactSize.lean`](ZebraChainArith/CompactSize.lean))
+### `CompactSize64` ([`Zebrafm/CompactSize.lean`](Zebrafm/CompactSize.lean))
 
 The Rust target is `zebra-chain/src/serialization/compact_size.rs`.
 
@@ -116,7 +116,7 @@ lake build           # kernel-checks every theorem in the project
 To print the axiom dependency of each theorem:
 
 ```sh
-lake env lean ZebraChainArith/Check.lean
+lake env lean Zebrafm/Check.lean
 ```
 
 ## Modelling notes

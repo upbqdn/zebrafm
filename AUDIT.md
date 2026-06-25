@@ -1,14 +1,14 @@
 # Independent Formal-Verification Audit
 
 Date: 2026-06-25
-Auditor: independent (third-party review of `ZebraChainArith`)
+Auditor: independent (third-party review of `Zebrafm`)
 Scope:
 1. ZCG Grant #324 (Runtime Verification pilot) proposal coverage.
 2. Wider Zebra consensus-critical surface.
 
 This audit was performed by inspecting every module under
-`/home/m/zcash/zebra-chain-verify/ZebraChainArith/ZebraChainArith/` and
-`/home/m/zcash/zebra-chain-verify/ZebraChainArith/ZebraChainArith/ZebraChainArith/`,
+`/home/m/zcash/zebra-chain-verify/Zebrafm/Zebrafm/` and
+`/home/m/zcash/zebra-chain-verify/Zebrafm/Zebrafm/Zebrafm/`,
 counting theorems and lemmas with `grep -c "^theorem\|^lemma"`, reading
 the substantive content of every module that does not appear in `REPORT.md`
 or `ROADMAP.md`, and running `lake build` end-to-end. `lake build` reports
@@ -19,39 +19,39 @@ kernel-checks under Lean 4 + Mathlib.
 
 | Tier | Location | Modules | Theorems/lemmas |
 |---|---|---|---|
-| Top-level | `ZebraChainArith/*.lean` | 37 (Basic, Check, TestVectors carry no claims) | **439** |
-| Nested | `ZebraChainArith/ZebraChainArith/*.lean` | 7 | **140** |
+| Top-level | `Zebrafm/*.lean` | 37 (Basic, Check, TestVectors carry no claims) | **439** |
+| Nested | `Zebrafm/Zebrafm/*.lean` | 7 | **140** |
 | **Total** | | **41 substantive** | **579** |
 
 (`REPORT.md` advertises 270 across 23. The repository has substantially
 overgrown its own report; the live audit count is more than 2x the
 reported figure.)
 
-The 21 modules currently `import`-ed by the top-level `ZebraChainArith.lean`
+The 21 modules currently `import`-ed by the top-level `Zebrafm.lean`
 correspond to the 23-module figure in `REPORT.md`. The following modules
 are present and build but **not** yet wired into the top-level umbrella
 import or into the `Check.lean` axiom-printer:
 
-- `ZebraChainArith/CanopyDeferredEarn.lean` (20)
-- `ZebraChainArith/CompactDifficulty.lean` (26)
-- `ZebraChainArith/DAAMedianWindow.lean` (16)
-- `ZebraChainArith/EquihashSolution.lean` (11)
-- `ZebraChainArith/HistoryTreeAppendOnly.lean` (21)
-- `ZebraChainArith/NetworkUpgradeBridge.lean` (5)
-- `ZebraChainArith/OrchardActionBounds.lean` (22)
-- `ZebraChainArith/SaplingNoteCommitment.lean` (15)
-- `ZebraChainArith/SlowStartSubsidy.lean` (15)
-- `ZebraChainArith/TransactionV5Header.lean` (12)
-- `ZebraChainArith/Zip244Composition.lean` (10)
-- `ZebraChainArith/ZebraChainArith/EquihashParams.lean` (23)
-- `ZebraChainArith/ZebraChainArith/NoteCommitmentTreeDepth.lean` (19)
-- `ZebraChainArith/ZebraChainArith/Nullifiers.lean` (30)
-- `ZebraChainArith/ZebraChainArith/SighashTypes.lean` (20)
-- `ZebraChainArith/ZebraChainArith/TransparentAddress.lean` (14)
-- `ZebraChainArith/ZebraChainArith/ValueCommitment.lean` (15)
-- `ZebraChainArith/ZebraChainArith/Zip209NegativeValuePool.lean` (19)
+- `Zebrafm/CanopyDeferredEarn.lean` (20)
+- `Zebrafm/CompactDifficulty.lean` (26)
+- `Zebrafm/DAAMedianWindow.lean` (16)
+- `Zebrafm/EquihashSolution.lean` (11)
+- `Zebrafm/HistoryTreeAppendOnly.lean` (21)
+- `Zebrafm/NetworkUpgradeBridge.lean` (5)
+- `Zebrafm/OrchardActionBounds.lean` (22)
+- `Zebrafm/SaplingNoteCommitment.lean` (15)
+- `Zebrafm/SlowStartSubsidy.lean` (15)
+- `Zebrafm/TransactionV5Header.lean` (12)
+- `Zebrafm/Zip244Composition.lean` (10)
+- `Zebrafm/Zebrafm/EquihashParams.lean` (23)
+- `Zebrafm/Zebrafm/NoteCommitmentTreeDepth.lean` (19)
+- `Zebrafm/Zebrafm/Nullifiers.lean` (30)
+- `Zebrafm/Zebrafm/SighashTypes.lean` (20)
+- `Zebrafm/Zebrafm/TransparentAddress.lean` (14)
+- `Zebrafm/Zebrafm/ValueCommitment.lean` (15)
+- `Zebrafm/Zebrafm/Zip209NegativeValuePool.lean` (19)
 
-Recommendation (low effort, high value): add `import ZebraChainArith.X`
+Recommendation (low effort, high value): add `import Zebrafm.X`
 lines and `#print axioms` entries for each so they fall under the same
 zero-axiom guarantee that the rest of the project advertises. `lake build`
 already kernel-checks them; they are simply not re-exported.
@@ -379,7 +379,7 @@ exceeds it.**
   kind of artefact a downstream maintainer needs.
 - `lake build` passes with 830 jobs, no `sorry`, no user-introduced
   axioms, axiom dependency printed for every theorem
-  (`ZebraChainArith/Check.lean`).
+  (`Zebrafm/Check.lean`).
 
 The pilot phase as scoped delivers everything it promised, and the
 project has substantially overgrown its own report — the live build
@@ -446,7 +446,7 @@ The pilot:
   579 kernel-checked theorems covering ~16/23 ROADMAP items and parts of
   the original proposal's phases 4 and 8.
 - **Bookkeeping cleanup needed:** REPORT.md is stale (says 270/23 but
-  build contains 579/41); `ZebraChainArith.lean` and `Check.lean` need 18
+  build contains 579/41); `Zebrafm.lean` and `Check.lean` need 18
   added `import` and `#print axioms` lines so the newer modules
   participate in the zero-axiom claim. `lake build` already kernel-checks
   them — only the umbrella entry points are out of date.

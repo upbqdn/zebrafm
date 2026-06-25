@@ -6,7 +6,7 @@ the Coq proof.
 
 ## Files
 
-- `ZebraChainArith.v` — Aeneas-emitted Coq from the `rust-crate/` source.
+- `Zebrafm.v` — Aeneas-emitted Coq from the `rust-crate/` source.
 - `Primitives.v` — Aeneas's Coq standard library (copied verbatim from
   `aeneas/backends/coq/`).
 - `Proofs.v` — proofs against the emitted definitions. Currently a single
@@ -20,8 +20,8 @@ Requires Aeneas built locally (see the top-level [`REPORT.md`](../REPORT.md)).
 ```sh
 cd ../rust-crate
 ~/aeneas/charon/bin/charon cargo --preset=aeneas
-~/aeneas/bin/aeneas -backend coq -dest /tmp/out-coq zebra_chain_arith.llbc
-cp /tmp/out-coq/{ZebraChainArith,Primitives}.v ../coq-pipeline/
+~/aeneas/bin/aeneas -backend coq -dest /tmp/out-coq zebrafm.llbc
+cp /tmp/out-coq/{Zebrafm,Primitives}.v ../coq-pipeline/
 ```
 
 ## Building

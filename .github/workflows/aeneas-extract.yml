@@ -78,10 +78,10 @@ jobs:
           eval "$(opam env --switch=aeneas)"
           cd rust-crate
           mkdir -p /tmp/aeneas-out
-          ~/aeneas/bin/aeneas -backend lean -dest /tmp/aeneas-out zebra_chain_arith.llbc
+          ~/aeneas/bin/aeneas -backend lean -dest /tmp/aeneas-out zebrafm.llbc
 
       - name: Diff regenerated Extracted.lean against committed copy
         run: |
           diff -u aeneas-pipeline/AeneasPipeline/Extracted.lean \
-                  /tmp/aeneas-out/ZebraChainArith.lean
+                  /tmp/aeneas-out/Zebrafm.lean
           echo "Aeneas re-extract matches committed Extracted.lean."

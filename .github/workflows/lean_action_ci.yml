@@ -16,4 +16,4 @@ jobs:
       - name: Install Lean / Mathlib
         uses: leanprover/lean-action@v1
       - name: Print axiom dependencies of every theorem
-        run: lake env lean ZebraChainArith/Check.lean
+        run: lake env lean Zebrafm/Check.lean

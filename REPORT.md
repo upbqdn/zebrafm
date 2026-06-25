@@ -10,32 +10,32 @@ block and transaction through:
 
 | Family | Rust source | Lean module |
 |---|---|---|
-| `Height` arithmetic | `zebra-chain/src/block/height.rs` | `ZebraChainArith/Height.lean` |
-| `Amount` arithmetic | `zebra-chain/src/amount.rs` | `ZebraChainArith/Amount.lean` |
-| `CompactSize64` serialization | `zebra-chain/src/serialization/compact_size.rs` | `ZebraChainArith/CompactSize.lean` |
-| `NetworkUpgrade` activation logic | `zebra-chain/src/parameters/network_upgrade.rs` + `constants.rs` | `ZebraChainArith/NetworkUpgrade.lean` |
-| `LockTime` serialisation | `zebra-chain/src/transaction/lock_time.rs` | `ZebraChainArith/LockTime.lean` |
-| `halving` / `block_subsidy` | `zebra-chain/src/parameters/network/subsidy.rs` | `ZebraChainArith/Subsidy.lean` |
-| ZIP-317 conventional fee | `zebra-chain/src/transaction/unmined/zip317.rs` | `ZebraChainArith/Zip317.lean` |
-| Consensus branch IDs | `zebra-chain/src/parameters/network_upgrade.rs:225` | `ZebraChainArith/ConsensusBranchId.lean` |
-| Block / protocol size limits | `zebra-chain/src/block/serialize.rs` + `serialization/zcash_serialize.rs` | `ZebraChainArith/BlockSizeLimits.lean` |
-| Coinbase maturity | `zebra-chain/src/transparent.rs:54` | `ZebraChainArith/CoinbaseMaturity.lean` |
-| Block max-time (future block tolerance) | `zebra-chain/src/parameters/network_upgrade.rs` + `constants.rs` | `ZebraChainArith/BlockMaxTime.lean` |
-| Reorg-window finality | `MAX_BLOCK_REORG_HEIGHT` | `ZebraChainArith/ReorgWindow.lean` |
-| Founders' reward | `zebra-chain/src/parameters/network/subsidy.rs:539` | `ZebraChainArith/FoundersReward.lean` |
-| Addr / Inv message caps | `zebra-network/src/constants.rs:301`, `protocol/external/inv.rs:190,201` | `ZebraChainArith/AddrMessageCap.lean` |
-| Mempool admission (unpaid actions) | `zebra-chain/src/transaction/unmined/zip317.rs` | `ZebraChainArith/MempoolAdmission.lean` |
-| Bech32 (BIP-173) encoding shape | BIP-173 | `ZebraChainArith/Bech32.lean` |
-| Min network protocol version per NU | `zebra-network/src/protocol/external/types.rs:88`, `constants.rs:411` | `ZebraChainArith/MinNetworkVersion.lean` |
-| Testnet min-difficulty rule (ZIP-208) | `zebra-chain/src/parameters/network_upgrade.rs` | `ZebraChainArith/TestnetMinDifficulty.lean` |
-| PoW averaging window | `POW_AVERAGING_WINDOW`, `POW_MEDIAN_BLOCK_SPAN` | `ZebraChainArith/PowAveragingWindow.lean` |
-| BIP-34 coinbase height prefix | `zebra-chain/src/transparent/serialize.rs:58` | `ZebraChainArith/Bip34CoinbaseHeight.lean` |
-| Block header fixed layout (140 bytes) | `zebra-chain/src/block/header.rs` | `ZebraChainArith/BlockHeader.lean` |
-| Block / transaction hash round-trip | `zebra-chain/src/block/hash.rs`, `transaction/hash.rs` | `ZebraChainArith/HashRoundTrip.lean` |
-| `ValueBalance<NonNegative>` (pool balances) | `zebra-chain/src/value_balance.rs` | `ZebraChainArith/PoolValueBalance.lean` |
+| `Height` arithmetic | `zebra-chain/src/block/height.rs` | `Zebrafm/Height.lean` |
+| `Amount` arithmetic | `zebra-chain/src/amount.rs` | `Zebrafm/Amount.lean` |
+| `CompactSize64` serialization | `zebra-chain/src/serialization/compact_size.rs` | `Zebrafm/CompactSize.lean` |
+| `NetworkUpgrade` activation logic | `zebra-chain/src/parameters/network_upgrade.rs` + `constants.rs` | `Zebrafm/NetworkUpgrade.lean` |
+| `LockTime` serialisation | `zebra-chain/src/transaction/lock_time.rs` | `Zebrafm/LockTime.lean` |
+| `halving` / `block_subsidy` | `zebra-chain/src/parameters/network/subsidy.rs` | `Zebrafm/Subsidy.lean` |
+| ZIP-317 conventional fee | `zebra-chain/src/transaction/unmined/zip317.rs` | `Zebrafm/Zip317.lean` |
+| Consensus branch IDs | `zebra-chain/src/parameters/network_upgrade.rs:225` | `Zebrafm/ConsensusBranchId.lean` |
+| Block / protocol size limits | `zebra-chain/src/block/serialize.rs` + `serialization/zcash_serialize.rs` | `Zebrafm/BlockSizeLimits.lean` |
+| Coinbase maturity | `zebra-chain/src/transparent.rs:54` | `Zebrafm/CoinbaseMaturity.lean` |
+| Block max-time (future block tolerance) | `zebra-chain/src/parameters/network_upgrade.rs` + `constants.rs` | `Zebrafm/BlockMaxTime.lean` |
+| Reorg-window finality | `MAX_BLOCK_REORG_HEIGHT` | `Zebrafm/ReorgWindow.lean` |
+| Founders' reward | `zebra-chain/src/parameters/network/subsidy.rs:539` | `Zebrafm/FoundersReward.lean` |
+| Addr / Inv message caps | `zebra-network/src/constants.rs:301`, `protocol/external/inv.rs:190,201` | `Zebrafm/AddrMessageCap.lean` |
+| Mempool admission (unpaid actions) | `zebra-chain/src/transaction/unmined/zip317.rs` | `Zebrafm/MempoolAdmission.lean` |
+| Bech32 (BIP-173) encoding shape | BIP-173 | `Zebrafm/Bech32.lean` |
+| Min network protocol version per NU | `zebra-network/src/protocol/external/types.rs:88`, `constants.rs:411` | `Zebrafm/MinNetworkVersion.lean` |
+| Testnet min-difficulty rule (ZIP-208) | `zebra-chain/src/parameters/network_upgrade.rs` | `Zebrafm/TestnetMinDifficulty.lean` |
+| PoW averaging window | `POW_AVERAGING_WINDOW`, `POW_MEDIAN_BLOCK_SPAN` | `Zebrafm/PowAveragingWindow.lean` |
+| BIP-34 coinbase height prefix | `zebra-chain/src/transparent/serialize.rs:58` | `Zebrafm/Bip34CoinbaseHeight.lean` |
+| Block header fixed layout (140 bytes) | `zebra-chain/src/block/header.rs` | `Zebrafm/BlockHeader.lean` |
+| Block / transaction hash round-trip | `zebra-chain/src/block/hash.rs`, `transaction/hash.rs` | `Zebrafm/HashRoundTrip.lean` |
+| `ValueBalance<NonNegative>` (pool balances) | `zebra-chain/src/value_balance.rs` | `Zebrafm/PoolValueBalance.lean` |
 
 Concrete test vectors taken from the Rust doctests are in
-`ZebraChainArith/TestVectors.lean` and are `decide`-checked.
+`Zebrafm/TestVectors.lean` and are `decide`-checked.
 
 ## Architecture
 
@@ -47,8 +47,8 @@ flowchart LR
     CH[Charon]
     AE[Aeneas]
     LE["aeneas-pipeline/<br/>Extracted.lean"]
-    CO["coq-pipeline/<br/>ZebraChainArith.v"]
-    HL["ZebraChainArith/<br/>hand-translated Lean"]
+    CO["coq-pipeline/<br/>Zebrafm.v"]
+    HL["Zebrafm/<br/>hand-translated Lean"]
     PT["rust-crate/tests/<br/>proptest"]
 
     ZC -. drift-check .-> AN
@@ -122,8 +122,8 @@ types. To regenerate the extraction:
 cd rust-crate
 ~/aeneas/charon/bin/charon cargo --preset=aeneas
 mkdir -p ../aeneas-pipeline/AeneasPipeline
-~/aeneas/bin/aeneas -backend lean -dest /tmp/out zebra_chain_arith.llbc
-cp /tmp/out/ZebraChainArith.lean ../aeneas-pipeline/AeneasPipeline/Extracted.lean
+~/aeneas/bin/aeneas -backend lean -dest /tmp/out zebrafm.llbc
+cp /tmp/out/Zebrafm.lean ../aeneas-pipeline/AeneasPipeline/Extracted.lean
 cd ../aeneas-pipeline && lake build
 ```
 
@@ -400,7 +400,7 @@ Requires [`elan`](https://github.com/leanprover/elan).
 ```sh
 lake exe cache get          # fetches Mathlib's prebuilt artifacts
 lake build                  # kernel-checks every theorem
-lake env lean ZebraChainArith/Check.lean   # prints the axiom set of every theorem
+lake env lean Zebrafm/Check.lean   # prints the axiom set of every theorem
 ```
 
 CI runs the same sequence on every push and pull request

@@ -6,7 +6,7 @@
 //! would catch — these tests fail.
 
 use proptest::prelude::*;
-use zebra_chain_arith::{amount, compact_size, height};
+use zebrafm::{amount, compact_size, height};
 
 // ---------- Height ----------
 
