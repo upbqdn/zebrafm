@@ -1,0 +1,12 @@
+name = "AeneasPipeline"
+version = "0.1.0"
+defaultTargets = ["AeneasPipeline"]
+
+[[require]]
+name = "Aeneas"
+git = "https://github.com/AeneasVerif/aeneas"
+rev = "main"
+subDir = "backends/lean"
+
+[[lean_lib]]
+name = "AeneasPipeline"

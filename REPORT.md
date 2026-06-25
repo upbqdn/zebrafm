@@ -19,10 +19,19 @@ Concrete test vectors taken from the Rust doctests are in
 
 ## Methodology
 
-The Rust source is **hand-translated** to Lean 4. Each Rust item is mapped
-to a corresponding Lean definition; theorems are stated about the Lean
-definitions and proved using Mathlib tactics (`omega`, `linarith`, `simp`,
-`decide`, structural induction).
+There are two parallel Lean projects in this repo:
+
+1. **The hand-translated proofs (top-level).** The primary verification.
+   Each Rust item is mapped to a corresponding Lean definition; theorems
+   are stated about the Lean definitions and proved using Mathlib tactics
+   (`omega`, `linarith`, `simp`, `decide`, structural induction).
+
+2. **The Aeneas-extracted proofs ([`aeneas-pipeline/`](aeneas-pipeline/)).**
+   A separate Lean project that ingests definitions emitted by the
+   `Charon → Aeneas → Lean` pipeline. The Rust extraction crate at
+   [`rust-crate/`](rust-crate/) is the source.
+
+### Hand-translation (top-level project)
 
 The `i64` and `i128` widening from the Rust source is modelled as `Int`
 arithmetic, with explicit upper-bound hypotheses where the Rust type widths
@@ -34,17 +43,45 @@ matter:
 - `CompactSize64`: `n ≤ U64_MAX = 2^64 - 1` for the band-4 round-trip and
   the universal round-trip.
 
-### What this methodology does *not* provide
+### Aeneas extraction (`aeneas-pipeline/`)
 
-- **No automated drift detection.** The Lean model is hand-translated.
-  If the Rust source in `zebra-chain` changes, the model does not
-  automatically catch it. Closing this gap requires either an Aeneas-based
-  extraction pipeline (lift Rust → Lean automatically) or a CI step that
-  diffs the live `zebra-chain` source against an anchored snapshot.
-- **No byte-level I/O modelling.** The encoder/decoder operate over `List
-  Nat`, not over `byteorder::Reader`/`Writer`. The proofs cover the
-  *semantic content* of the encoding; the I/O glue is treated as a thin,
-  trusted shim in the Rust source.
+[`rust-crate/`](rust-crate/) is a self-contained Rust crate that mirrors
+the load-bearing semantic content of the three target modules from
+`zebra-chain`, in a form Aeneas can ingest. The Rust `byteorder` and
+`io::Read`/`io::Write` boundary is replaced by `&[u8]` and `Vec<u8>` —
+the small adaptation the original proposal called out as the
+extraction-crate shim.
+
+[`aeneas-pipeline/`](aeneas-pipeline/) is a Lean project that imports the
+Aeneas-emitted definitions and proves a handful of representative examples
+against them in Aeneas's `Result`-monadic style over `Std.U32`/`Std.I64`
+types. To regenerate the extraction:
+
+```sh
+cd rust-crate
+~/aeneas/charon/bin/charon cargo --preset=aeneas
+mkdir -p ../aeneas-pipeline/AeneasPipeline
+~/aeneas/bin/aeneas -backend lean -dest /tmp/out zebra_chain_arith.llbc
+cp /tmp/out/ZebraChainArith.lean ../aeneas-pipeline/AeneasPipeline/Extracted.lean
+cd ../aeneas-pipeline && lake build
+```
+
+### What the combined methodology does *and* does not provide
+
+- ✅ **Mechanical Rust-to-Lean lift via Aeneas.** The Aeneas pipeline
+  proves the principle: the Rust source in `rust-crate/` is mechanically
+  lifted to Lean and is amenable to proof.
+- ⚠️ **Partial drift detection.** When the Rust crate changes, the
+  emitted Lean changes, and the Aeneas-side proofs would break. This
+  catches drift between the *Rust extraction crate* and *its Lean
+  extract*. It does NOT yet catch drift between the live
+  `zebra-chain/src/...` source and our `rust-crate/`. Closing that final
+  gap needs a CI step that diffs `rust-crate/src/{amount,compact_size,
+  height}.rs` against pinned snippets of `zebra-chain`.
+- ⚠️ **No byte-level I/O modelling.** The encoder/decoder operate over
+  `List Nat` (top-level proofs) or `Vec u8` (Aeneas). The
+  `byteorder::Reader`/`Writer` boundary in `zebra-chain` is treated as a
+  thin trusted shim.
 
 ## Result
 
