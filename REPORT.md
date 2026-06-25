@@ -13,6 +13,7 @@ block and transaction through:
 | `Height` arithmetic | `zebra-chain/src/block/height.rs` | `ZebraChainArith/Height.lean` |
 | `Amount` arithmetic | `zebra-chain/src/amount.rs` | `ZebraChainArith/Amount.lean` |
 | `CompactSize64` serialization | `zebra-chain/src/serialization/compact_size.rs` | `ZebraChainArith/CompactSize.lean` |
+| `NetworkUpgrade` activation logic | `zebra-chain/src/parameters/network_upgrade.rs` + `constants.rs` | `ZebraChainArith/NetworkUpgrade.lean` |
 
 Concrete test vectors taken from the Rust doctests are in
 `ZebraChainArith/TestVectors.lean` and are `decide`-checked.
@@ -89,7 +90,7 @@ cd ../aeneas-pipeline && lake build
 
 ## Result
 
-**45 theorems** kernel-checked across the three modules, plus 27 concrete
+**54 theorems** kernel-checked across the four modules, plus 27 concrete
 test vectors verified by `decide`. No `sorry`. No user-introduced axioms.
 No unproved theorems. Every result depends only on Lean 4's three
 foundational axioms (`propext`, `Quot.sound`, `Classical.choice`), which
@@ -136,6 +137,19 @@ all Mathlib proofs share.
 | `neg_neg_eq` | `neg` is involutive |
 | `checkedSub_as_add` | `sub a b = add a (neg b)` |
 | `checkedAdd_zero` | `checkedAdd a 0 = validate a` |
+
+#### `NetworkUpgrade` (9 theorems)
+| Name | Statement |
+|---|---|
+| `current_zero` | Genesis is in force at height 0 |
+| `current_at_activation_height` | `current(activationHeight(nu)) = nu` |
+| `current_on_nu5_band` | `current` is constant `nu5` on `[NU5, NU6)` |
+| `current_on_nu6_band` | `current` is constant `nu6` on `[NU6, NU6_1)` |
+| `current_monotone_at_nu6` | NU5→NU6 boundary is monotone |
+| `current_below_nu6` | `current(NU6 − 1) = nu5` |
+| `current_surjective` | Every upgrade has a witness height |
+| `current_total` | `current` is a total function |
+| `activation_heights_strictly_increasing` | The mainnet heights have no collisions |
 
 #### `CompactSize` (15 theorems)
 | Name | Statement |

@@ -1,6 +1,7 @@
 import ZebraChainArith.Height
 import ZebraChainArith.Amount
 import ZebraChainArith.CompactSize
+import ZebraChainArith.NetworkUpgrade
 
 open Zebra
 
@@ -54,3 +55,14 @@ open Zebra
 #print axioms CompactSize.encode_first_byte_canonical
 #print axioms CompactSize.encode_nonempty
 #print axioms CompactSize.roundtrip_universal
+
+-- NetworkUpgrade
+#print axioms NetworkUpgrade.current_zero
+#print axioms NetworkUpgrade.current_at_activation_height
+#print axioms NetworkUpgrade.current_on_nu5_band
+#print axioms NetworkUpgrade.current_on_nu6_band
+#print axioms NetworkUpgrade.current_monotone_at_nu6
+#print axioms NetworkUpgrade.current_below_nu6
+#print axioms NetworkUpgrade.current_surjective
+#print axioms NetworkUpgrade.current_total
+#print axioms NetworkUpgrade.activation_heights_strictly_increasing

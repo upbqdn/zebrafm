@@ -1,0 +1,87 @@
+name: Aeneas re-extract
+
+on:
+  push:
+    paths:
+      - 'rust-crate/**'
+      - 'aeneas-pipeline/AeneasPipeline/Extracted.lean'
+      - '.github/workflows/aeneas-extract.yml'
+  pull_request:
+    paths:
+      - 'rust-crate/**'
+      - 'aeneas-pipeline/AeneasPipeline/Extracted.lean'
+      - '.github/workflows/aeneas-extract.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      OPAMYES: "1"
+      OPAMCONFIRMLEVEL: "unsafe-yes"
+      # Bump when Aeneas pinning changes.
+      AENEAS_REV: main
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Cache opam
+        id: cache-opam
+        uses: actions/cache@v4
+        with:
+          path: ~/.opam
+          key: opam-aeneas-5.3.0-${{ runner.os }}-v1
+
+      - name: Cache Aeneas + Charon build
+        id: cache-aeneas
+        uses: actions/cache@v4
+        with:
+          path: ~/aeneas
+          key: aeneas-${{ env.AENEAS_REV }}-${{ runner.os }}-v1
+
+      - name: Install OCaml & system deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y opam libgmp-dev pkg-config
+
+      - name: Initialize opam (cold cache only)
+        if: steps.cache-opam.outputs.cache-hit != 'true'
+        run: |
+          opam init --bare --disable-sandboxing
+          opam switch create aeneas 5.3.0
+          eval "$(opam env --switch=aeneas)"
+          opam install -y ppx_deriving visitors easy_logging zarith yojson \
+            core_unix odoc ocamlgraph menhir ocamlformat.0.27.0 unionFind \
+            progress domainslib ppx_deriving_yojson
+
+      - name: Build Aeneas (cold cache only)
+        if: steps.cache-aeneas.outputs.cache-hit != 'true'
+        run: |
+          eval "$(opam env --switch=aeneas)"
+          git clone https://github.com/AeneasVerif/aeneas.git ~/aeneas
+          cd ~/aeneas
+          git checkout "${AENEAS_REV}"
+          make setup-charon
+          make
+
+      - name: Run Charon on rust-crate
+        run: |
+          eval "$(opam env --switch=aeneas)"
+          cd rust-crate
+          ~/aeneas/charon/bin/charon cargo --preset=aeneas
+
+      - name: Run Aeneas to emit Lean
+        run: |
+          eval "$(opam env --switch=aeneas)"
+          cd rust-crate
+          mkdir -p /tmp/aeneas-out
+          ~/aeneas/bin/aeneas -backend lean -dest /tmp/aeneas-out zebra_chain_arith.llbc
+
+      - name: Diff regenerated Extracted.lean against committed copy
+        run: |
+          diff -u aeneas-pipeline/AeneasPipeline/Extracted.lean \
+                  /tmp/aeneas-out/ZebraChainArith.lean
+          echo "Aeneas re-extract matches committed Extracted.lean."
