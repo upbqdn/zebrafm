@@ -16,3 +16,9 @@ rev = "v4.31.0"
 
 [[lean_lib]]
 name = "ZebraChainArith"
+
+[[lean_lib]]
+name = "ZebraChainArithSpec"
+
+[[lean_lib]]
+name = "ZebraChainArithProofs"

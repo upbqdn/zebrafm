@@ -204,6 +204,52 @@ theorem sum_singleton_nonNegative (a : Int)
   obtain ⟨h0, hM⟩ := h
   simp [show a + 0 = a from by ring, h0, hM]
 
+/-- **T15 (Sum value extraction).** When `sumFold` succeeds, its result equals
+the natural integer sum of the list. This is the substantive equivalence to
+"repeated `checked_add`": whatever the fold returns *as a value* is the
+mathematical sum the iterator computes. -/
+theorem sum_value (c : Constraint) (xs : List Int) (r : Int)
+    (heq : sumFold c xs = some r) :
+    r = xs.foldr (· + ·) 0 := by
+  induction xs generalizing r with
+  | nil =>
+    unfold sumFold Constraint.validate at heq
+    simp only [List.foldr_nil]
+    rcases c with _ | _ | _ <;>
+      (simp only [Constraint.lo, Constraint.hi, MAX_MONEY, COIN] at heq
+       split_ifs at heq with _
+       simp only [Option.some.injEq] at heq
+       omega)
+  | cons a xs ih =>
+    rw [sumFold] at heq
+    rcases h : sumFold c xs with _ | acc
+    · rw [h] at heq; simp at heq
+    · rw [h] at heq
+      simp only at heq
+      have hacc : acc = xs.foldr (· + ·) 0 := ih acc h
+      unfold checkedAdd Constraint.validate at heq
+      split_ifs at heq with _
+      simp only [Option.some.injEq] at heq
+      simp [List.foldr_cons, ← heq, hacc]
+
+/-- **T16 (Sum result in range).** If the fold returns `Some`, that value lies
+in the constraint's range. -/
+theorem sum_in_range (c : Constraint) (xs : List Int) (r : Int)
+    (heq : sumFold c xs = some r) : c.lo ≤ r ∧ r ≤ c.hi := by
+  induction xs generalizing r with
+  | nil =>
+    unfold sumFold Constraint.validate at heq
+    split_ifs at heq with hcond
+    simp only [Option.some.injEq] at heq
+    subst heq; exact hcond
+  | cons a xs ih =>
+    rw [sumFold] at heq
+    rcases h : sumFold c xs with _ | acc
+    · rw [h] at heq; simp at heq
+    · rw [h] at heq
+      simp only at heq
+      exact checkedAdd_in_range c a acc r heq
+
 /-! ## Bonus theorems -/
 
 /-- **B1.** `checkedAdd` is commutative. -/
