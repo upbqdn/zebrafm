@@ -11,7 +11,7 @@
 *)
 
 Require Import Primitives.
-Require Import ZebraChainArith.
+Require Import Zebrafm.
 
 Import Result.
 Import Notations.

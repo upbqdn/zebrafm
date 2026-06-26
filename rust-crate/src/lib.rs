@@ -1,4 +1,4 @@
-//! `zebra-chain-arith` — extraction crate for the Lean verification of
+//! `zebrafm` — extraction crate for the Lean verification of
 //! `zebra-chain` arithmetic and parsing.
 //!
 //! This crate mirrors the load-bearing semantic content of the corresponding

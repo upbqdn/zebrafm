@@ -1,4 +1,4 @@
--Q . ZebraChainArith
+-Q . Zebrafm
 Primitives.v
-ZebraChainArith.v
+Zebrafm.v
 Proofs.v

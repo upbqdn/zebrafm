@@ -5,7 +5,7 @@ import AeneasPipeline.Funs
 
 This file demonstrates that the Aeneas-extracted Lean definitions are
 provable against the same kind of theorems we proved in the parent
-`ZebraChainArith` project, just in Aeneas's `Result`-monadic style over
+`Zebrafm` project, just in Aeneas's `Result`-monadic style over
 `Std.U32` / `Std.I64` / `alloc.vec.Vec` types.
 
 We discharge a few representative examples to witness that the pipeline
@@ -15,7 +15,7 @@ project for the kernel-checked `Nat`/`Int`-style proof set.
 -/
 
 open Aeneas Aeneas.Std Result
-open zebra_chain_arith
+open zebrafm
 
 /-- **try_from_u32 of 0 succeeds with 0.** Simplest case on the boundary. -/
 example : height.try_from_u32 0#u32 = ok (some 0#u32) := by

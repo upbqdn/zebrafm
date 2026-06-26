@@ -1,13 +1,22 @@
-# zebrafm — Lean 4 proofs for [zebra-chain](https://github.com/ZcashFoundation/zebra)
+# zebrafm — Lean 4 proofs for [Zebra](https://github.com/ZcashFoundation/zebra)
 
-(formerly `zebra-chain-arith`; renamed once the scope outgrew "arith")
+Kernel-checked Lean 4 theorems for the consensus + protocol surface of the
+Zcash Foundation's Zebra full node, covering **`zebra-chain`,
+`zebra-consensus`, `zebra-network`, `zebra-state`, `zebra-rpc`,
+`zebra-script`, `tower-batch-control`, `tower-fallback`, and `zebrad`**.
 
-Kernel-checked Lean 4 theorems for the consensus surface of zebra-chain:
-
-- `Height` arithmetic (block heights, activation comparisons),
-- `Amount` arithmetic (zatoshi balances under `Constraint` markers),
-- `CompactSize64` serialization (variable-length integer encoding) plus
-  `CompactSizeMessage` DoS cap.
+- **1935 theorems across 80 modules** (`lake build` passes 909 jobs).
+- The original pilot scope (Amount / CompactSize / Height) is in
+  [`Zebrafm/Height.lean`](Zebrafm/Height.lean) /
+  [`Zebrafm/Amount.lean`](Zebrafm/Amount.lean) /
+  [`Zebrafm/CompactSize.lean`](Zebrafm/CompactSize.lean) — that's the
+  18-theorem ZCG-grant-shaped core; the rest extends across the whole
+  consensus surface, subsidy schedule, ZIP-defined rules, network message
+  caps, mempool admission, RPC error codes, state DB format, and more.
+- See [REPORT.md](REPORT.md) for the per-module inventory, [FINDINGS.md](FINDINGS.md)
+  for the 207 adversarially-extracted findings (including ones the
+  verification surfaced about the Lean models themselves), and
+  [ROADMAP.md](ROADMAP.md) for what's still open.
 
 All theorems are kernel-checked with **no `sorry`**, **no user-introduced
 axioms**, and **no unproved theorems**. They depend only on the three Lean 4
