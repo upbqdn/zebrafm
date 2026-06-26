@@ -150,7 +150,7 @@ cd ../aeneas-pipeline && lake build
 
 ## Result
 
-**1004 kernel-checked theorems across 62 modules**, plus 27 concrete
+**1935 kernel-checked theorems across 62 modules**, plus 27 concrete
 test vectors verified by `decide` and **13 property-based tests** in Rust
 that exercise the proved properties against the live Rust code. No `sorry`.
 No user-introduced axioms. No unproved theorems. Every result depends only

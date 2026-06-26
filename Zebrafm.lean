@@ -71,3 +71,15 @@ import Zebrafm.PedersenAbstract
 import Zebrafm.NU63IronwoodLayout
 -- ValueCommitment (from wave 2 fan-out triple-nested, recovered):
 import Zebrafm.ValueCommitment
+-- Wave 5:
+import Zebrafm.ConsensusCheckpoint
+import Zebrafm.ConsensusBlockMaxSize
+import Zebrafm.NetworkInventoryRotation
+import Zebrafm.NetworkHandshakeVersion
+import Zebrafm.NetworkOutboundLimit
+import Zebrafm.StateFormatVersion
+import Zebrafm.RpcErrorCodes
+import Zebrafm.RpcGetbestblockhash
+import Zebrafm.TowerBatchControl
+import Zebrafm.TowerFallbackPolicy
+import Zebrafm.ZebradBlockNotify
